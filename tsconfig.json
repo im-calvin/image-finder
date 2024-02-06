@@ -5,7 +5,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
-    }
+    },
+    "module": "ESNext",
+    "target": "ES6"
   },
   "include": ["**/*.ts", "**/*.tsx", "webpack.config.js"]
 }
