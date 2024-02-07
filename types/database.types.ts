@@ -37,19 +37,19 @@ export type Database = {
     Tables: {
       images: {
         Row: {
-          description: string | null
+          description: string
           embedding: string | null
           id: number
           image_path: string
         }
         Insert: {
-          description?: string | null
+          description: string
           embedding?: string | null
           id?: number
           image_path: string
         }
         Update: {
-          description?: string | null
+          description?: string
           embedding?: string | null
           id?: number
           image_path?: string

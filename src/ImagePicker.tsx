@@ -7,7 +7,6 @@ export default function ImagePicker() {
   const [photos, setPhotos] = useState<Asset[]>([]);
   const [descriptions, setDescriptions] = useState<string[]>([]);
 
-  console.log(descriptions);
   useEffect(() => {
     async function getPhotos() {
       const { status } = await requestPermissionsAsync();
@@ -21,8 +20,7 @@ export default function ImagePicker() {
         });
         setPhotos(media.assets);
         const openAIDescriptions = await getOpenAIDescriptions(media.assets);
-        
-        setDescriptions(openAIDescriptions.message.content?.split("\n\n") || []);
+        setDescriptions(openAIDescriptions);
       }
     }
     getPhotos();

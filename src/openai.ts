@@ -44,20 +44,27 @@ const createImageObject = async (asset: Asset): Promise<ImageI> => {
 // get images from Supabase
 async function getAllImagePathsFromSupabase(): Promise<string[]> {
   const { data, error } = await SupabaseClient.from("images").select("image_path")
-  if (!data || error) {
-    console.error("Error fetching images from Supabase");
-    return []
+  if (error) {
+    throw new Error("Error fetching images from Supabase")
   }
   return data.map((item) => item.image_path);
 }
 
 // Example function to post data to OpenAI
-export const getOpenAIDescriptions = async (assets: Asset[]) => {
+export const getOpenAIDescriptions = async (assets: Asset[]): Promise<string[]> => {
   const userImages = await Promise.all(assets.map((asset) => createImageObject(asset)));
-  const dbImages = await getAllImagePathsFromSupabase();
+  const dbImagePaths = await getAllImagePathsFromSupabase();
 
   // find new images
-  const newImages = userImages.filter((image) => !dbImages.includes(image.image_path));
+  const newImages = userImages.filter((image) => !dbImagePaths.includes(image.image_path));
+
+  if (newImages.length === 0) {
+    const {data, error} = await SupabaseClient.from('images').select('description').in('image_path', dbImagePaths)
+    if (error) {
+      throw new Error('Supabase pre-existing image paths not found')
+    }
+    return data.map(item => item.description);
+  }
 
   // get objects for openai request
   const openAIImages: OpenAIImage[] = newImages.map((image) => ({
@@ -106,10 +113,11 @@ export const getOpenAIDescriptions = async (assets: Asset[]) => {
       description
     });
 
-    console.log(data, count)
-    console.error(error);
+    if (error) {
+      throw new Error('Unable to upsert new images')
+    }
+
   }
+
+  return descriptions
 }
-
-
-
