@@ -4,14 +4,13 @@ import ImagePicker from "@/ImagePicker";
 import ImageFinder from "@/ImageFinder";
 
 import "./styles.css";
-
-const NUM_IMAGES = 6;
+import ImageGetter from "@/ImageGetter";
 
 export default function App() {
   return (
     <View className="items-center justify-center flex-1 bg-white">
+      <ImageGetter />
       <ImageFinder />
-      <ImagePicker numImages={NUM_IMAGES} />
       <StatusBar style="auto" />
     </View>
   );
