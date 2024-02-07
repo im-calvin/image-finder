@@ -121,3 +121,25 @@ export const getOpenAIDescriptions = async (assets: Asset[]): Promise<string[]> 
 
   return descriptions
 }
+
+export async function getClosestQuery(query: string, matchCount: number, similarityThreshold: number) {
+  // create embeddings of query
+  const embeddings = (
+    await OpenAIClient.embeddings.create({
+      input: query,
+      model: "text-embedding-3-small",
+    })
+  ).data[0].embedding; // there should only be 1 vector
+  
+  // find n closest images
+  const {data, error} = await SupabaseClient.rpc('match_images', {
+    'query_embedding': JSON.stringify(embeddings),
+    'similarity_threshold': similarityThreshold,
+    'match_count': matchCount
+  })
+
+  if (error) {
+    throw new Error('No matches found') // TODO don't throw an error and return something to user
+  }
+  return data;
+}
